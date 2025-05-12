@@ -1,0 +1,1889 @@
+<!DOCTYPE html> <!-- To Copilot: DO NOT EDIT: This file is just to show you the HTML code of the CogiSearch website. https://search.cogilabs.eu/ -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CogiSearch</title>
+  <link rel="shortcut icon" href="/CogiSearch-favicon.ico">
+  <script src="customBangs.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light theme (default) */
+      --background-color: #f8f9fa;
+      --card-background: #ffffff;
+      --text-color: #212529;
+      --secondary-text-color: #6c757d;
+      --accent-color: #4361ee;
+      --accent-hover: #3a56d4;
+      --input-background: #ffffff;
+      --input-border: #dee2e6;
+      --input-focus-border: #4361ee;
+      --button-background: #4361ee;
+      --button-text-color: #ffffff;
+      --button-hover-background: #3a56d4;
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      --border-color: #e9ecef;
+      --footer-background: #212529;
+      --footer-text-color: #f8f9fa;
+      --footer-link-color: #4361ee;
+      --footer-link-hover: #90a5ff;
+      --notification-background: rgba(0, 0, 0, 0.8);
+      --notification-text-color: white;
+      --bang-tag-background: #e7f0ff;
+      --autocomp-hover-background: #e7f0ff;
+      --bang-tag-color: #4361ee;
+      --section-divider: #e9ecef;
+      --toggle-background: #e9ecef;
+      --toggle-button: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --background-color: #121212;
+      --card-background: #1e1e1e;
+      --text-color: #e0e0e0;
+      --secondary-text-color: #aaaaaa;
+      --accent-color: #738aff;
+      --accent-hover: #90a5ff;
+      --input-background: #2d2d2d;
+      --input-border: #3d3d3d;
+      --input-focus-border: #738aff;
+      --button-background: #738aff;
+      --button-text-color: #121212;
+      --button-hover-background: #90a5ff;
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+      --border-color: #333333;
+      --footer-background: #000000;
+      --footer-text-color: #e0e0e0;
+      --footer-link-color: #738aff;
+      --footer-link-hover: #90a5ff;
+      --notification-background: rgba(255, 255, 255, 0.8);
+      --notification-text-color: black;
+      --bang-tag-background: #2a3052;
+      --autocomp-hover-background: #3d4572;
+      --bang-tag-color: #738aff;
+      --section-divider: #333333;
+      --toggle-background: #555555;
+      --toggle-button: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      transition: all 0.3s ease;
+    }
+
+    .landing-page {
+      display: none;
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .search-container {
+      margin: 2rem auto 3rem;
+      text-align: center;
+    }
+
+    .logo-container {
+      margin-bottom: 2.5rem;
+      text-align: center;
+      width: 100%;
+      height: 115px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo-container object {
+      max-width: 450px;
+      width: 100%;
+      height: 100%;
+      border: none;
+      object-fit: contain;
+    }
+
+    .logo {
+      max-width: 450px;
+      width: 100%;
+      height: auto;
+    }
+
+    .search-form {
+      display: flex;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: var(--card-shadow);
+      border-radius: 50px;
+      overflow: visible;
+      transition: all 0.3s ease;
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: var(--input-background);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      z-index: 10;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      margin-top: 5px;
+    }
+
+    .autocomplete-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+      background-color: var(--autocomp-hover-background);
+    }
+
+    .autocomplete-item.selected {
+      background-color: var(--accent-color);
+      color: var(--button-text-color);
+    }
+
+    .bang-shortcut-ac {
+      font-weight: bold;
+      background-color: var(--autocomp-hover-background);
+      color: var(--bang-tag-color);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      margin-right: 10px;
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .autocomplete-item:hover .bang-shortcut-ac {
+      background-color: var(--card-background);
+    }
+
+    .autocomplete-item.selected .bang-shortcut-ac {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: var(--button-text-color);
+    }
+
+    .bang-name-ac {
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-form:focus-within {
+      box-shadow: var(--card-hover-shadow);
+      transform: translateY(-2px);
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      border: 2px solid var(--input-border);
+      border-right: none;
+      border-radius: 50px 0 0 50px;
+      background-color: var(--input-background);
+      color: var(--text-color);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--input-focus-border);
+    }
+
+    .search-button {
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      border: none;
+      background-color: var(--button-background);
+      color: var(--button-text-color);
+      cursor: pointer;
+      border-radius: 0 50px 50px 0;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .search-button:hover {
+      background-color: var(--button-hover-background);
+    }
+
+    .add-to-browser {
+      margin: 1.5rem auto;
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--secondary-text-color);
+    }
+
+    .clickToCopy {
+      cursor: pointer;
+      font-weight: 600;
+      background-color: var(--bang-tag-background);
+      color: var(--bang-tag-color);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      border: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .clickToCopy:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .emphase {
+      font-weight: 600;
+      background-color: var(--bang-tag-background);
+      color: var(--bang-tag-color);
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+      margin-bottom: 5rem;
+    }
+
+    .custom-bangs-list {
+      white-space: normal;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .custom-bangs-list.show {
+      max-height: 300px;
+      padding-top: 0.75rem;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+        display: grid;
+      }
+
+      .card {
+        height: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .about-container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .custom-bangs-list {
+        overflow-y: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 0.75rem;
+        padding-bottom: 0.5rem;
+        max-height: 300px;
+      }
+
+      .settings-container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .card {
+      background-color: var(--card-background);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--card-hover-shadow);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title .icon {
+      font-size: 1.3rem;
+      color: var(--accent-color);
+    }
+
+    .about-container p {
+      margin-bottom: 1rem;
+    }
+
+    .about-container a {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid transparent;
+    }
+
+    .about-container a:hover {
+      color: var(--accent-hover);
+      border-bottom: 1px solid var(--accent-hover);
+    }
+
+    .default-engine-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .setting-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .default-engine-select {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 2px solid var(--input-border);
+      border-radius: 8px;
+      background-color: var(--input-background);
+      color: var(--text-color);
+      outline: none;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .default-engine-select:focus {
+      border-color: var(--input-focus-border);
+    }
+
+    .custom-bang-container, .custom-engine-container {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .user-bang-container {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+
+    .bang-prefix {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+      color: var(--bang-tag-color);
+      transition: all 0.2s ease;
+    }
+
+    .arrow {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+      margin-left: 0.5rem;
+      color: var(--bang-tag-color);
+      transition: all 0.2s ease;
+    }
+
+    .custom-bang-input, .custom-engine-input, .custom-url-input, .user-bang-input, .user-bang-url-input {
+      flex: 1;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 2px solid var(--input-border);
+      border-radius: 8px;
+      background-color: var(--input-background);
+      color: var(--text-color);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .user-bang-input {
+      flex: 0.2;
+      min-width: 100px;
+    }
+
+    .user-bang-input:focus, .user-bang-url-input:focus {
+      border-color: var(--input-focus-border);
+    }
+
+    .custom-bang-input:focus, .custom-engine-input:focus, .custom-url-input:focus {
+      border-color: var(--input-focus-border);
+    }
+
+    .custom-bang-button, .custom-engine-button, .user-bang-add-button {
+      margin-left: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      background-color: var(--button-background);
+      color: var(--button-text-color);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .custom-bang-button:hover, .custom-engine-button:hover, .user-bang-add-button:hover {
+      background-color: var(--button-hover-background);
+    }
+
+    .current-default {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--bang-tag-background);
+      color: var(--bang-tag-color);
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle-container {
+      margin-top: 1rem;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .theme-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .theme-slider {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+      background-color: var(--toggle-background);
+      border-radius: 34px;
+      transition: .4s;
+      margin-right: 0.75rem;
+    }
+
+    .theme-slider:before {
+      position: absolute;
+      content: "";
+      height: 24px;
+      width: 24px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--toggle-button);
+      border-radius: 50%;
+      transition: .4s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    input:checked + .theme-slider {
+      background-color: var(--accent-color);
+    }
+
+    input:checked + .theme-slider:before {
+      transform: translateX(30px);
+    }
+
+    .theme-label {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .user-bangs-list {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      margin-bottom: 1rem;
+    }
+
+    .user-bang-delete-button {
+      position: sticky;
+      top: 0;
+      right: 0.5rem;
+      float: right;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--secondary-text-color);
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0 0.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      margin-left: auto;
+      margin-right: 0;
+      margin-top: -1rem;
+    }
+
+    .user-bang-delete-button:hover {
+      color: #e74c3c;
+      transform: scale(1.2);
+    }
+
+    .user-bang-item {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background-color: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+      margin-bottom: 0.5rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .user-bang-url {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding-right: 30px;
+    }
+
+    .user-bang-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow);
+    }
+
+    .custom-bangs-toggle {
+      color: var(--accent-color);
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      padding: 0.5rem 0;
+      transition: all 0.3s ease;
+    }
+
+    .custom-bangs-toggle span {
+      transition: transform 0.3s ease;
+    }
+
+    .custom-bangs-toggle.active span {
+      transform: rotate(180deg);
+    }
+
+    .custom-bangs-list {
+      white-space: normal;
+    }
+
+    .custom-bangs-list.show {
+      max-height: 500px;
+      padding-top: 0.75rem;
+      overflow-y: auto;
+    }
+
+    .bang-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background-color: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .bang-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow);
+    }
+
+    .bang-shortcut {
+      font-weight: bold;
+      background-color: var(--bang-tag-background);
+      color: var(--bang-tag-color);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .bang-name {
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .copy-notification {
+      font-family: 'Inter', sans-serif;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--notification-background);
+      color: var(--notification-text-color);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      font-weight: 500;
+      z-index: 1000;
+    }
+
+    .copy-notification.show {
+      display: block;
+      opacity: 1;
+    }
+
+    .footer {
+      background-color: var(--footer-background);
+      color: var(--footer-text-color);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 900;
+    }
+
+    .footer-content {
+      flex: 1;
+      text-align: center;
+    }
+
+    .footer-spacer {
+      width: 80px;
+    }
+
+    .footer-logo {
+      height: 30px;
+      max-width: 120px;
+      object-fit: contain;
+    }
+
+    .footer a {
+      color: var(--footer-text-color);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer a:hover {
+      color: var(--footer-link-hover);
+    }
+
+    @media (max-width: 768px) {
+      .landing-page {
+        padding: 1.5rem;
+      }
+
+      .logo-container object,
+      .logo {
+        max-width: 300px;
+      }
+
+      .search-form {
+        flex-direction: column;
+        border-radius: 12px;
+      }
+
+      .search-input {
+        border-right: 2px solid var(--input-border);
+        border-radius: 12px 12px 0 0;
+        border-bottom: none;
+      }
+
+      .search-button {
+        border-radius: 0 0 12px 12px;
+      }
+
+      .custom-bang-container, .custom-engine-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .custom-bang-button, .custom-engine-button {
+        margin-left: 0;
+        margin-top: 0.75rem;
+        width: 100%;
+      }
+
+      .user-bang-container {
+        flex-direction: column;
+        align-items: flex-start;
+        position: relative;
+        padding-left: 1.5rem;
+      }
+
+      .bang-prefix {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.5rem;
+      }
+
+      .user-bang-add-button {
+        margin-left: 0;
+        margin-top: 0.75rem;
+        width: 100%;
+      }
+
+      .user-bang-input, .user-bang-url-input {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+
+      .footer-spacer {
+        display: none;
+      }
+
+      .bang-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .bang-shortcut {
+        margin-bottom: 0.5rem;
+      }
+
+      .user-bang-item {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        white-space: normal;
+        max-width: 100%;
+        position: relative;
+      }
+
+      .user-bang-url {
+        white-space: normal;
+        word-break: break-all;
+        width: 100%;
+        padding-right: 30px;
+      }
+
+      .user-bang-delete-button {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        margin: 0;
+        border: none;
+        background: none;
+      }
+
+      .arrow {
+        display: none;
+      }
+    }
+
+    .or-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .or-divider-text {
+      padding: 0 1rem;
+      color: var(--secondary-text-color);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .option-selector {
+      margin-bottom: 1rem;
+    }
+
+    .option-selector label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+    }
+
+    .option-selector input[type="radio"] {
+      margin-right: 0.5rem;
+    }
+
+    .option-content {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+      padding-top: 0.5rem;
+    }
+
+    .option-content.hidden {
+      display: none;
+    }
+
+    .setting-section {
+      background-color: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .setting-section-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .url-preview {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--secondary-text-color);
+      word-break: break-all;
+    }
+
+    .url-preview.error {
+      color: #e74c3c;
+    }
+  </style>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="CogiSearch">
+  <meta name="description" content="A fast, customizable bang-powered search router by Cogilabs.">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://search.cogilabs.eu/">
+  <meta property="og:title" content="CogiSearch">
+  <meta property="og:description" content="A fast, customizable bang-powered search router by Cogilabs.">
+  <meta property="og:image" content="/CogiSearchEmbed.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://search.cogilabs.eu/">
+  <meta property="twitter:title" content="CogiSearch">
+  <meta property="twitter:description" content="A fast, customizable bang-powered search router by Cogilabs.">
+  <meta property="twitter:image" content="/CogiSearchEmbed.png">
+
+  <!-- Discord -->
+  <meta name="theme-color" content="#4361ee">
+
+</head>
+<body>
+  <div class="landing-page" role="main">
+    <div class="search-container">
+      <div class="logo-container">
+        <object type="image/svg+xml" data="cogiSearch.svg" class="logo" title="CogiSearch Logo">
+          <p>Your browser does not support SVG. Please visit <a href="https://cogilabs.eu">Cogilabs.eu</a> for more information.</p>
+        </object>
+      </div>
+
+      <form class="search-form" onsubmit="handleSearch(event)" aria-label="Search form">
+        <input type="text" class="search-input" placeholder="Search the web..." id="searchInput" autofocus aria-label="Search input">
+        <button type="submit" class="search-button" aria-label="Submit search">Search</button>
+        <div id="autocompleteDropdown" class="autocomplete-dropdown" role="listbox" aria-label="Bang suggestions"></div>
+      </form>
+
+      <p class="add-to-browser">Add to your browser: <span class="clickToCopy" role="button" tabindex="0" aria-label="Click to copy search URL">https://search.cogilabs.eu/?q=%s</span></p>
+    </div>
+
+    <div class="main-content">
+      <div class="card about-container" role="region" aria-labelledby="about-title">
+        <h2 class="card-title" id="about-title">
+          <span class="icon" aria-hidden="true">ℹ️</span> About CogiSearch
+        </h2>
+        <p>CogiSearch is a search router inspired by <a href="https://duckduckgo.com/bang/" target="_blank">DuckDuckGo's bang feature</a>. It's faster, lets you set your preferred default search engine, and even lets you add your own custom bangs!</p>
+        <p>To use a bang, simply type <span class="emphase">!&lt;bang&gt;</span> in your search query. For example, search on Google with <span class="emphase">!g</span>.</p>
+        <p>All DuckDuckGo bangs are available, plus custom ones specifically added for CogiSearch.</p>
+        <p>You can also add your own user bangs, see the <a href="#user-banglist-title">User Bangs</a> section below.</p>
+
+        <span class="custom-bangs-toggle" id="customBangsToggle" aria-expanded="false" aria-controls="custom-bangs-list">
+          Available Custom Bangs :</span>
+        <div class="custom-bangs-list" id="custom-bangs-list">
+          <!-- Will be populated dynamically -->
+        </div>
+      </div>
+
+      <div class="card settings-container" role="region" aria-labelledby="settings-title">
+        <h2 class="card-title" id="settings-title">
+          <span class="icon" aria-hidden="true">⚙️</span> Settings
+        </h2>
+
+        <div class="default-engine-container setting-group" role="region" aria-labelledby="default-engine-title">
+          <h3 id="default-engine-title">Default Search Engine</h3>
+          <p class="setting-description">Choose which search engine to use when no bang is specified</p>
+
+          <div class="setting-section">
+            <div class="option-selector">
+              <label>
+                <input type="radio" name="engineChoice" checked id="popularEngineChoice" aria-describedby="popular-engine-description">
+                <span id="popular-engine-description">Choose from popular engines</span>
+              </label>
+
+              <div class="option-content" id="popularEngineContent">
+                <select id="defaultEngine" class="default-engine-select" onchange="saveDefaultEngine('select')" aria-label="Select default search engine">
+                  <option value="">DuckDuckGo (default)</option>
+                  <!-- Will be populated dynamically -->
+                </select>
+              </div>
+            </div>
+
+            <div class="option-selector">
+              <label>
+                <input type="radio" name="engineChoice" id="customBangChoice" aria-describedby="custom-bang-description">
+                <span id="custom-bang-description">Use a custom bang</span>
+              </label>
+
+              <div class="option-content hidden" id="customBangContent">
+                <div class="custom-bang-container">
+                  <span class="bang-prefix" aria-hidden="true">!</span>
+                  <input type="text" id="customBang" class="custom-bang-input" placeholder="Enter any bang..." aria-label="Enter custom bang">
+                  <button type="button" class="custom-bang-button" onclick="saveDefaultEngine('customBang')" aria-label="Set custom bang as default">Set Default</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="option-selector">
+              <label>
+                <input type="radio" name="engineChoice" id="customEngineUrlChoice" aria-describedby="custom-engine-url-description">
+                <span id="custom-engine-url-description">Use a custom engine URL</span>
+              </label>
+
+              <div class="option-content hidden" id="customEngineUrlContent">
+                <div class="custom-engine-container">
+                  <input type="text" id="customEngineUrl" class="custom-engine-input" placeholder="%s will be replaced by the query" aria-label="Enter custom search engine URL">
+                  <button type="button" class="custom-engine-button" onclick="saveDefaultEngine('customEngineUrl')" aria-label="Set custom URL as default">Set Default</button>
+                </div>
+                <div id="urlPreview" class="url-preview" aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="currentDefault" class="current-default" aria-live="polite">Current default: DuckDuckGo</div>
+        </div>
+
+        <div class="theme-toggle-container setting-group" role="region" aria-labelledby="appearance-title">
+          <h3 id="appearance-title">Appearance</h3>
+          <div class="setting-section">
+            <label class="theme-toggle" for="themeToggle">
+              <input type="checkbox" id="themeToggle" aria-label="Toggle dark mode">
+              <span class="theme-slider" aria-hidden="true"></span>
+              <span class="theme-label">Dark Mode</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card user-banglist-container full-width" role="region" aria-labelledby="user-banglist-title">
+        <h2 class="card-title" id="user-banglist-title">
+          <span class="icon" aria-hidden="true">📚</span> User Bangs
+        </h2>
+        <div>
+          <p>This section will allow you to add your own bangs to CogiSearch. They will be saved in your browser memory.</p>
+
+          <div class="user-bangs-list" id="user-bangs-list">
+            <!-- Will be populated dynamically -->
+          </div>
+
+          <form class="user-bang-container" onsubmit="addUserBang(event)">
+            <span class="bang-prefix" aria-hidden="true">!</span>
+            <input type="text" id="customBangName" class="user-bang-input" placeholder="Your bang" aria-label="Enter user bang name">
+            <span class="arrow" aria-hidden="true">→</span>
+            <input type="text" id="customBangUrl" class="user-bang-url-input" placeholder="URL, %s will be replaced by the query" aria-label="Enter user bang URL" oninput="previewUserBangUrl()">
+            <button type="submit" class="user-bang-add-button">Add Bang</button>
+          </form>
+          <div id="userBangUrlPreview" class="url-preview" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer" role="contentinfo">
+      <div class="footer-spacer"></div>
+      <div class="footer-content">
+        <p>Powered by <a href="https://Cogilabs.eu/" aria-label="Visit Cogilabs website">Cogilabs.eu</a></p>
+      </div>
+      <a href="https://Cogilabs.eu/" aria-label="Cogilabs homepage">
+        <img src="https://cogilabs.eu/Images/Cogilabs-long-contour-wh-notxt.svg" alt="Cogilabs Logo" class="footer-logo">
+      </a>
+    </footer>
+  </div>
+
+  <div class="copy-notification" id="copyNotification" role="alert" aria-live="assertive">Copied to clipboard!</div>
+
+  <script>
+    let bangData = [];
+    let userBangs = [];
+    const popularEngines = [
+      { t: 'g', name: 'Google' },
+      { t: 'gweb', name: 'Google Web Tab' },
+      { t: 'b', name: 'Bing' },
+      { t: 'y', name: 'Yahoo' },
+      { t: 'qw', name: 'Qwant' },
+      { t: 'brave', name: 'Brave Search' },
+      { t: 'sp', name: 'StartPage' },
+      { t: 'eco', name: 'Ecosia' },
+    ];
+
+    async function loadBangs() {
+      try {
+        const cached = localStorage.getItem('ddgBangs');
+        const lastUpdate = localStorage.getItem('ddgBangsTimestamp');
+        const cachedUserBangs = localStorage.getItem('userBangs');
+        const now = Date.now();
+
+        if (cachedUserBangs) {
+          userBangs = [...JSON.parse(cachedUserBangs)];
+        }
+
+        if (cached && lastUpdate && (now - parseInt(lastUpdate) < 24 * 60 * 60 * 1000)) {
+          bangData = [...JSON.parse(cached), ...customBangs];
+          populateDefaultEngineOptions();
+          return;
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        try {
+          const response = await fetch('ddgBangs.js', {
+            signal: controller.signal
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const text = await response.text();
+          const ddgBangs = JSON.parse(text);
+
+          localStorage.setItem('ddgBangs', JSON.stringify(ddgBangs));
+          localStorage.setItem('ddgBangsTimestamp', now.toString());
+
+          bangData = [...ddgBangs, ...customBangs];
+        } catch (fetchError) {
+          console.error('Error fetching bangs:', fetchError.name === 'AbortError' ?
+            'Request timed out after 5 seconds' : fetchError.message);
+
+          const cached = localStorage.getItem('ddgBangs');
+          if (cached) {
+            bangData = [...JSON.parse(cached), ...customBangs];
+          } else {
+            bangData = [...customBangs];
+          }
+        } finally {
+          populateDefaultEngineOptions();
+        }
+      } catch (error) {
+        console.error('Error loading bangs:', error);
+        const cached = localStorage.getItem('ddgBangs');
+        bangData = cached ? [...JSON.parse(cached), ...customBangs] : customBangs;
+        populateDefaultEngineOptions();
+      }
+    }
+
+    function populateDefaultEngineOptions() {
+      const select = document.getElementById('defaultEngine');
+      while (select.options.length > 1) {
+        select.remove(1);
+      }
+
+      popularEngines.forEach(engine => {
+        const found = bangData.find(b => b.t === engine.t);
+        if (found) {
+          const option = new Option(engine.name, engine.t);
+          select.add(option);
+        }
+      });
+
+      const defaultEngine = localStorage.getItem('defaultSearchEngine');
+      if (defaultEngine) {
+        if ([...select.options].some(opt => opt.value === defaultEngine)) {
+          select.value = defaultEngine;
+        } else {
+          select.value = "";
+          document.getElementById('customBang').value = defaultEngine;
+        }
+
+        updateCurrentDefaultDisplay(defaultEngine);
+      }
+    }
+
+    function validateCustomUrl(url) {
+      if (!url || url.trim() === '') {
+        return { valid: false, message: 'URL cannot be empty' };
+      }
+
+      if (!url.includes('%s')) {
+        return { valid: false, message: '%s is missing in the URL' };
+      }
+
+      try {
+        const urlObj = new URL(url);
+
+        if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+          return { valid: false, message: 'URL must use http or https protocol' };
+        }
+
+        return { valid: true };
+      } catch (e) {
+        return { valid: false, message: 'Invalid URL format' };
+      }
+    }
+
+    function updateCurrentDefaultDisplay(bangTag) {
+      const displayElement = document.getElementById('currentDefault');
+
+      if (bangTag && bangTag.startsWith("http")) {
+        displayElement.textContent = "Current default: Custom URL";
+        return;
+      }
+
+      if (!bangTag) {
+        displayElement.textContent = "Current default: DuckDuckGo";
+        return;
+      }
+
+      const bang = bangData.find(b => b.t === bangTag);
+      if (bang) {
+        displayElement.textContent = `Current default: ${bang.s} (!${bangTag})`;
+      }
+    }
+
+    function saveDefaultEngine(source) {
+      let value = '';
+
+      if (source === 'select') {
+        value = document.getElementById('defaultEngine').value;
+        document.getElementById('customBang').value = '';
+      } else if (source === 'customBang') {
+        value = document.getElementById('customBang').value.trim();
+        if (value.startsWith('!')) {
+          value = value.substring(1);
+        }
+
+        document.getElementById('defaultEngine').value = '';
+
+        if (value && !bangData.some(b => b.t === value)) {
+          alert(`The bang '!${value}' was not found in available bangs.`);
+          return;
+        }
+      } else if (source === 'customEngineUrl') {
+        const urlInput = document.getElementById('customEngineUrl').value.trim();
+        const validation = validateCustomUrl(urlInput);
+
+        if (!validation.valid) {
+          alert(validation.message);
+          return;
+        }
+
+        value = sanitizeUrl(urlInput);
+      }
+
+      if (value) {
+        localStorage.setItem('defaultSearchEngine', value);
+      } else {
+        localStorage.removeItem('defaultSearchEngine');
+      }
+
+      updateCurrentDefaultDisplay(value);
+    }
+
+    function sanitizeUrl(url) {
+      return url.replace(/javascript:/gi, '')
+                .replace(/data:/gi, '')
+                .replace(/vbscript:/gi, '');
+    }
+
+    function ensureValidSearchUrl(url, query) {
+      if (!url.includes('%s')) {
+        if (url.endsWith('=')) {
+          return url + encodeURIComponent(query);
+        }
+        else if (url.includes('?') && !url.includes('=')) {
+          return url + 'q=' + encodeURIComponent(query);
+        }
+        else {
+          const separator = url.includes('?') ? '&' : '?';
+          return url + separator + 'q=' + encodeURIComponent(query);
+        }
+      }
+
+      return url.replace('%s', encodeURIComponent(query));
+    }
+
+    function findBang(query) {
+      const tokens = query.split(' ');
+      const encodedQuery = encodeURIComponent(query);
+
+      const bangMap = new Map();
+
+      for (const bang of bangData) {
+        bangMap.set(bang.t, bang);
+      }
+
+      for (const bang of customBangs) {
+        bangMap.set(bang.t, bang);
+      }
+
+      for (const bang of userBangs) {
+        bangMap.set(bang.t, bang);
+      }
+
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i].trim();
+        if (token.startsWith('!')) {
+          const bangName = token.substring(1);
+          const bang = bangMap.get(bangName);
+
+          if (bang) {
+            tokens.splice(i, 1);
+            const cleanQuery = tokens.join(' ').trim();
+            const bangEncodedQuery = encodeURIComponent(cleanQuery);
+
+            if (!cleanQuery) {
+              try {
+                const bangUrl = bang.u.startsWith('/') ?
+                `https://duckduckgo.com${bang.u}` : bang.u;
+
+                const searchUrl = new URL(bang.u.replace('{{{s}}}', ''));
+
+                if (searchUrl.search || bang.u.includes('search') || bang.u.includes('query')) {
+                  const pathParts = searchUrl.pathname.split('/');
+                  if (pathParts.length > 1 &&
+                     (pathParts[pathParts.length-1].includes('search') ||
+                      pathParts[pathParts.length-1].includes('results'))) {
+                    pathParts.pop();
+                  }
+
+                  if (pathParts.length === 2 && pathParts[0] === "" && pathParts[1] === "") {
+                    return `${searchUrl.origin}/`;
+                  } else {
+                    return `${searchUrl.origin}${pathParts.join('/')}${pathParts.length > 1 ? '/' : ''}`;
+                  }
+                }
+
+                return searchUrl.origin + '/';
+
+              } catch (e) {
+                if (bang.d) {
+                  return `https://${bang.d}`;
+                }
+              }
+            }
+
+            if (bang.u.startsWith('/')) {
+              return `https://duckduckgo.com${bang.u.replace('{{{s}}}', bangEncodedQuery)}`;
+            }
+
+            return bang.u.replace('{{{s}}}', bangEncodedQuery);
+          }
+        }
+      }
+
+      const defaultEngine = localStorage.getItem('defaultSearchEngine');
+      if (defaultEngine) {
+        if (defaultEngine.startsWith("http")) {
+          if (defaultEngine.includes("search.cogilabs.eu")) {
+            return "https://search.cogilabs.eu/";
+          }
+          return ensureValidSearchUrl(defaultEngine, encodedQuery);
+        }
+        const defaultBang = bangMap.get(defaultEngine);
+        if (defaultBang) {
+          return defaultBang.u.replace('{{{s}}}', encodedQuery);
+        }
+      }
+
+      return 'https://duckduckgo.com/?q=' + encodedQuery;
+    }
+
+    function getUrlParameters() {
+      const params = new URLSearchParams(window.location.search);
+      const parameters = {};
+
+      for (const [key, value] of params.entries()) {
+        parameters[key] = value;
+      }
+
+      return parameters;
+    }
+
+    function handleSearch(event) {
+      event.preventDefault();
+      const query = document.getElementById('searchInput').value;
+      window.location.href = `?query=${encodeURIComponent(query)}`;
+    }
+
+    function showLandingPage() {
+      document.querySelector('.landing-page').style.display = 'block';
+    }
+
+    function populateCustomBangsList() {
+      const listContainer = document.querySelector('.custom-bangs-list');
+      if (!listContainer) return;
+
+      customBangs.sort((a, b) => a.s.localeCompare(b.s));
+
+      customBangs.forEach(bang => {
+        const bangItem = document.createElement('div');
+        bangItem.className = 'bang-item';
+
+        const shortcut = document.createElement('span');
+        shortcut.className = 'bang-shortcut clickToCopy';
+        shortcut.textContent = `!${bang.t}`;
+        shortcut.setAttribute('role', 'button');
+        shortcut.setAttribute('tabindex', '0');
+        shortcut.setAttribute('aria-label', `Copy ${bang.s} bang: !${bang.t}`);
+
+        const name = document.createElement('span');
+        name.className = 'bang-name';
+        name.textContent = bang.s;
+
+        bangItem.appendChild(shortcut);
+        bangItem.appendChild(name);
+        listContainer.appendChild(bangItem);
+      });
+    }
+
+    function populateUserBangsList() {
+      const listContainer = document.querySelector('.user-bangs-list');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = '';
+
+      userBangs.sort((a, b) => a.s.localeCompare(b.s));
+
+      userBangs.forEach(bang => {
+        const bangItem = document.createElement('div');
+        bangItem.className = 'user-bang-item';
+
+        const shortcut = document.createElement('span');
+        shortcut.className = 'user-bang-shortcut clickToCopy';
+        shortcut.textContent = `!${bang.t}`;
+        shortcut.setAttribute('role', 'button');
+        shortcut.setAttribute('tabindex', '0');
+        shortcut.setAttribute('aria-label', `Copy ${bang.s} bang: !${bang.t}`);
+
+        const arrow = document.createElement('span');
+        arrow.className = 'arrow';
+        arrow.textContent = '→';
+
+        const name = document.createElement('span');
+        name.className = 'user-bang-url';
+        name.innerHTML = bang.u.replace("{{{s}}}", "<strong>cat%20videos</strong>");
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'user-bang-delete-button';
+        deleteButton.innerHTML = '&times;'; // × symbol
+        deleteButton.setAttribute('data-name', bang.t);
+        deleteButton.setAttribute('aria-label', `Delete custom bang !${bang.t}`);
+        deleteButton.onclick = removeUserBang;
+
+        bangItem.appendChild(shortcut);
+        bangItem.appendChild(arrow);
+        bangItem.appendChild(name);
+        bangItem.appendChild(deleteButton);
+        listContainer.appendChild(bangItem);
+      });
+    }
+
+    function showNotification() {
+      const notification = document.getElementById('copyNotification');
+      notification.classList.add('show');
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 2000);
+    }
+
+    document.addEventListener('click', function (event) {
+      if (event.target.classList.contains('clickToCopy')) {
+        event.preventDefault();
+        const copyText = event.target.textContent;
+        navigator.clipboard.writeText(copyText)
+            .then(() => {
+              showNotification();
+            })
+            .catch(err => {
+              console.error('Failed to copy text: ', err);
+            });
+      }
+    });
+
+    function initThemeToggle() {
+      const themeToggle = document.getElementById('themeToggle');
+
+      if (!themeToggle) return;
+
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.checked = true;
+      }
+
+      themeToggle.addEventListener('change', function() {
+        if (this.checked) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+        }
+      });
+    }
+
+    function initEngineOptions() {
+      const popularChoice = document.getElementById('popularEngineChoice');
+      const customBangChoice = document.getElementById('customBangChoice');
+      const customEngineUrlChoice = document.getElementById('customEngineUrlChoice');
+      const popularContent = document.getElementById('popularEngineContent');
+      const customBangContent = document.getElementById('customBangContent');
+      const customEngineUrlContent = document.getElementById('customEngineUrlContent');
+
+      document.getElementById('customEngineUrl').addEventListener('input', function() {
+        const previewEl = document.getElementById('urlPreview');
+        if (!previewEl) return;
+
+        const url = this.value.trim();
+        const validation = validateCustomUrl(url);
+
+        if (validation.valid) {
+          const exampleQuery = "cat videos";
+          const exampleUrl = url.replace('%s', encodeURIComponent(exampleQuery));
+          previewEl.textContent = `Example: ${exampleUrl}`;
+          previewEl.classList.remove('error');
+        } else {
+          previewEl.textContent = validation.message;
+          previewEl.classList.add('error');
+        }
+      });
+
+      const defaultEngine = localStorage.getItem('defaultSearchEngine');
+      if (defaultEngine) {
+        const isPopular = [...document.getElementById('defaultEngine').options].some(opt => opt.value === defaultEngine);
+        const isCustomBang = !isPopular && !defaultEngine.startsWith('http') && bangData.some(b => b.t === defaultEngine);
+
+        if (isPopular) {
+          popularChoice.checked = true;
+          document.getElementById('defaultEngine').value = defaultEngine;
+          popularContent.classList.remove('hidden');
+          customBangContent.classList.add('hidden');
+          customEngineUrlContent.classList.add('hidden');
+        } else if (isCustomBang) {
+          customBangChoice.checked = true;
+          document.getElementById('customBang').value = defaultEngine;
+          popularContent.classList.add('hidden');
+          customBangContent.classList.remove('hidden');
+          customEngineUrlContent.classList.add('hidden');
+        } else {
+          customEngineUrlChoice.checked = true;
+          document.getElementById('customEngineUrl').value = defaultEngine;
+          popularContent.classList.add('hidden');
+          customBangContent.classList.add('hidden');
+          customEngineUrlContent.classList.remove('hidden');
+        }
+
+        updateCurrentDefaultDisplay(defaultEngine);
+      }
+
+      popularChoice.addEventListener('change', function() {
+        if (this.checked) {
+          popularContent.classList.remove('hidden');
+          customBangContent.classList.add('hidden');
+          customEngineUrlContent.classList.add('hidden');
+          saveDefaultEngine('select');
+        }
+      });
+
+      customBangChoice.addEventListener('change', function() {
+        if (this.checked) {
+          popularContent.classList.add('hidden');
+          customBangContent.classList.remove('hidden');
+          customEngineUrlContent.classList.add('hidden');
+          document.getElementById('customBang').focus();
+        }
+      });
+
+      customEngineUrlChoice.addEventListener('change', function() {
+        if (this.checked) {
+          popularContent.classList.add('hidden');
+          customBangContent.classList.add('hidden');
+          customEngineUrlContent.classList.remove('hidden');
+          document.getElementById('customEngineUrl').focus();
+        }
+      });
+    }
+
+    function equalizeCardHeights() {
+      if (window.innerWidth >= 768) {  // Only equalize on desktop
+        const settingsCard = document.querySelector('.settings-container');
+        const aboutCard = document.querySelector('.about-container');
+        const bangsList = document.querySelector('.custom-bangs-list');
+
+        if (!settingsCard || !aboutCard || !bangsList) return;
+
+        aboutCard.style.height = 'auto';
+        settingsCard.style.height = 'auto';
+        bangsList.style.maxHeight = 'none';
+
+        const settingsHeight = settingsCard.offsetHeight;
+
+        let aboutContentHeight = 0;
+        for (const child of aboutCard.children) {
+          if (child !== bangsList) {
+            aboutContentHeight += child.offsetHeight;
+          }
+        }
+
+        const bangsMaxHeight = settingsHeight - aboutContentHeight - 30;
+
+        bangsList.style.maxHeight = `${bangsMaxHeight > 100 ? bangsMaxHeight : 100}px`;
+
+        aboutCard.style.height = `${settingsHeight}px`;
+      } else {
+        const aboutCard = document.querySelector('.about-container');
+        const bangsList = document.querySelector('.custom-bangs-list');
+
+        if (aboutCard) aboutCard.style.height = 'auto';
+        if (bangsList) bangsList.style.maxHeight = '300px';
+      }
+    }
+
+    function previewUserBangUrl() {
+      const urlInput = document.getElementById('customBangUrl').value.trim();
+      const previewEl = document.getElementById('userBangUrlPreview');
+
+      if (!previewEl) return;
+
+      const validation = validateCustomUrl(urlInput);
+
+      if (validation.valid) {
+        const exampleQuery = "cat videos";
+        const exampleUrl = urlInput.replace('%s', encodeURIComponent(exampleQuery));
+        previewEl.textContent = `Example: ${exampleUrl}`;
+        previewEl.classList.remove('error');
+      } else if (urlInput) {
+        previewEl.textContent = validation.message;
+        previewEl.classList.add('error');
+      } else {
+        previewEl.textContent = '';
+      }
+    }
+
+    function addUserBang(event) {
+      event.preventDefault();
+
+      let bangName = document.getElementById('customBangName').value.trim();
+      const url = document.getElementById('customBangUrl').value.trim();
+      const domain = url.split('/')[2];
+
+      if (!bangName) {
+        alert('Please enter a bang name');
+        return;
+      }
+
+      if (bangName.startsWith("!")) {
+        bangName = bangName.substring(1);
+      }
+
+      if (url.includes('search.cogilabs.eu')) {
+        alert('You cannot add a custom bang for CogiSearch itself.');
+        return;
+      }
+
+      const validation = validateCustomUrl(url);
+      if (!validation.valid) {
+        alert(validation.message);
+        return;
+      }
+
+      const bang = { d: domain, r: 500, t: bangName, s: bangName, u: url.replace("%s", "{{{s}}}") };
+
+      if (userBangs.some(b => b.t === bangName)) {
+        alert(`The bang '${bangName}' already exists.`);
+        return;
+      }
+
+      userBangs.push(bang);
+      localStorage.setItem('userBangs', JSON.stringify(userBangs));
+      populateUserBangsList();
+
+      document.getElementById('customBangName').value = '';
+      document.getElementById('customBangUrl').value = '';
+      document.getElementById('userBangUrlPreview').textContent = '';
+    }
+
+    function removeUserBang(event) {
+      event.preventDefault();
+
+      const name = event.target.getAttribute('data-name');
+      const confirmDelete = confirm(`Are you sure you want to delete the custom bang !${name}? This action cannot be undone.`);
+
+      if (confirmDelete) {
+        const index = userBangs.findIndex(b => b.t === name);
+
+        if (index > -1) {
+          userBangs.splice(index, 1);
+          localStorage.setItem('userBangs', JSON.stringify(userBangs));
+          populateUserBangsList();
+        }
+      }
+    }
+
+    function setupAutocomplete() {
+      const searchInput = document.getElementById('searchInput');
+      const dropdown = document.getElementById('autocompleteDropdown');
+      let selectedIndex = -1;
+      let filteredBangs = [];
+
+      function showAutocomplete(query) {
+        dropdown.innerHTML = '';
+        dropdown.style.display = 'block';
+
+        const allBangs = [...bangData, ...userBangs];
+
+        if (query === '') {
+          const topDdgBangs = bangData
+            .filter(bang => bang.r)
+            .sort((a, b) => b.r - a.r)
+            .slice(0, 5);
+
+          filteredBangs = [...topDdgBangs, ...userBangs].slice(0, 10);
+        } else {
+          filteredBangs = allBangs
+            .filter(bang => bang.t.toLowerCase().startsWith(query.toLowerCase()))
+            .sort((a, b) => {
+              if (!a.r && !b.r) return 0;
+              if (!a.r) return 1;
+              if (!b.r) return -1;
+
+              return b.r - a.r;
+            })
+            .slice(0, 10);
+        }
+
+        if (filteredBangs.length === 0) {
+          dropdown.style.display = 'none';
+          return;
+        }
+
+        filteredBangs.forEach((bang, index) => {
+          const item = document.createElement('div');
+          item.className = 'autocomplete-item';
+          if (index === 0) item.classList.add('selected');
+          item.setAttribute('role', 'option');
+          item.setAttribute('tabindex', '0');
+
+          const contentContainer = document.createElement('div');
+          contentContainer.className = 'autocomplete-content';
+          contentContainer.style.display = 'flex';
+          contentContainer.style.flexGrow = '1';
+          contentContainer.style.alignItems = 'baseline';
+
+          const shortcut = document.createElement('div');
+          shortcut.className = 'bang-shortcut-ac';
+          shortcut.textContent = `!${bang.t}`;
+
+          const name = document.createElement('div');
+          name.className = 'bang-name-ac';
+          name.textContent = bang.s || bang.t;
+
+          contentContainer.appendChild(shortcut);
+          contentContainer.appendChild(name);
+
+          item.appendChild(contentContainer);
+
+          const isCustomBang = customBangs.some(b => b.t === bang.t);
+          const isUserBang = userBangs.some(b => b.t === bang.t);
+
+          if (isCustomBang || isUserBang) {
+            const badgeIcon = document.createElement('span');
+            badgeIcon.className = 'bang-badge';
+            badgeIcon.style.marginLeft = 'auto';
+            badgeIcon.style.fontSize = '1rem';
+            badgeIcon.style.opacity = '0.8';
+
+            if (isCustomBang) {
+              badgeIcon.innerHTML = '<img src="Cogilabs-icon-clrs.svg" height="20" alt="" style="vertical-align: middle; width: auto;">';
+              badgeIcon.title = 'CogiSearch custom bang';
+            } else if (isUserBang) {
+              badgeIcon.textContent = '👤+';
+              badgeIcon.title = 'Your custom bang';
+            }
+
+            item.appendChild(badgeIcon);
+          }
+
+          item.addEventListener('click', () => {
+            selectBang(bang.t);
+          });
+
+          item.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              selectBang(bang.t);
+            }
+          });
+
+          dropdown.appendChild(item);
+        });
+
+        selectedIndex = 0;
+      }
+
+      function selectBang(bangName) {
+        const currentValue = searchInput.value;
+        const bangStart = currentValue.lastIndexOf('!');
+
+        if (bangStart >= 0) {
+          const newValue = currentValue.substring(0, bangStart) +
+                          '!' + bangName + ' ';
+          searchInput.value = newValue;
+          searchInput.focus();
+        }
+
+        dropdown.style.display = 'none';
+        selectedIndex = -1;
+      }
+
+      searchInput.addEventListener('input', () => {
+        const value = searchInput.value;
+        const lastBangIndex = value.lastIndexOf('!');
+
+        if (lastBangIndex >= 0 && lastBangIndex === value.length - 1) {
+          showAutocomplete('');
+        } else if (lastBangIndex >= 0 && !value.substring(lastBangIndex).includes(' ')) {
+          const bangQuery = value.substring(lastBangIndex + 1);
+          showAutocomplete(bangQuery);
+        } else {
+          dropdown.style.display = 'none';
+        }
+      });
+
+      searchInput.addEventListener('keydown', (e) => {
+        if (dropdown.style.display === 'block') {
+          const items = dropdown.querySelectorAll('.autocomplete-item');
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            updateSelection(items);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, 0);
+            updateSelection(items);
+          } else if (e.key === 'Tab' && items.length > 0) {
+            e.preventDefault();
+            if (selectedIndex >= 0) {
+              selectBang(filteredBangs[selectedIndex].t);
+            } else if (filteredBangs.length > 0) {
+              selectBang(filteredBangs[0].t);
+            }
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            dropdown.style.display = 'none';
+          }
+        }
+      });
+
+      function updateSelection(items) {
+        items.forEach((item, index) => {
+          if (index === selectedIndex) {
+            item.classList.add('selected');
+            item.scrollIntoView({ block: 'nearest' });
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && e.target !== searchInput) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    async function init() {
+      const urlParams = getUrlParameters();
+
+      if (urlParams.q) {
+        await loadBangs();
+        const searchResult = findBang(urlParams.q);
+        window.location.replace(searchResult);
+      } else if (urlParams.query) {
+        await loadBangs();
+        const searchResult = findBang(urlParams.query);
+        window.location.replace(searchResult);
+      } else {
+        showLandingPage();
+        await loadBangs();
+        populateCustomBangsList();
+        populateUserBangsList();
+        initThemeToggle();
+        initEngineOptions();
+        setupAutocomplete();
+        equalizeCardHeights();
+        window.addEventListener('resize', equalizeCardHeights);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

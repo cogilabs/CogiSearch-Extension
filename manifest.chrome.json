@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "CogiSearch",
+  "version": "1.2",
+  "description": "Use CogiSearch as your search engine with synchronized custom bangs.",
+  "icons": {
+    "48": "icons/CogiSearch-icon48x.png",
+    "96": "icons/CogiSearch-icon96x.png"
+  },
+  "action": {
+    "default_icon": "icons/CogiSearch-icon48x.png",
+    "default_popup": "popup.html",
+    "default_title": "CogiSearch settings"
+  },
+  "background": {
+    "service_worker": "background-wrapper.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://search.cogilabs.eu/*"],
+      "js": ["browser-polyfill.js", "content-script.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "chrome_settings_overrides": {
+    "search_provider": {
+      "name": "CogiSearch",
+      "search_url": "https://search.cogilabs.eu/?q={searchTerms}",
+      "keyword": "CogiSearch",
+      "favicon_url": "https://search.cogilabs.eu/CogiSearch-favicon.ico",
+      "encoding": "UTF-8",
+      "is_default": true
+    }
+  },
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://search.cogilabs.eu/*"
+  ]
+}

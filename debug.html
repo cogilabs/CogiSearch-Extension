@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CogiSearch Debug</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+    button { 
+      margin: 5px; 
+      padding: 8px 12px;
+      background-color: #4361ee;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button#clearStorage {
+      background-color: #e63946;
+    }
+    pre { 
+      background: #f5f5f5; 
+      padding: 12px; 
+      border-radius: 4px;
+      overflow: auto;
+      max-height: 200px;
+    }
+    .button-group { 
+      margin: 15px 0; 
+      display: flex;
+      gap: 10px;
+    }
+    h2 { 
+      margin-top: 30px; 
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .workflow-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .workflow-buttons button {
+      flex-grow: 1;
+    }
+    .step {
+      background-color: #e9ecef;
+      border-radius: 50%;
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      text-align: center;
+      line-height: 24px;
+      margin-right: 8px;
+    }
+    h3 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>CogiSearch Debug</h1>
+  
+  <h2>Testing Workflow</h2>
+  <button id="showGuide">Show Testing Guide</button>
+  
+  <div class="workflow-buttons">
+    <button id="clearStorage"><span class="step">1</span>Clear All Storage</button>
+    <button id="openSite"><span class="step">2</span>Open CogiSearch</button>
+    <button id="setupLocal"><span class="step">3</span>Set Up Local Bangs</button>
+    <button id="setupTest"><span class="step">4</span>Set Up Sync Bangs</button>
+  </div>
+  
+  <h2>Storage Tools</h2>
+  <div class="button-group">
+    <button id="showStorage">Show Current Storage</button>
+  </div>
+  <div id="storageDisplay"></div>
+  
+  <script src="browser-polyfill.js"></script>
+  <script src="debug.js"></script>
+</body>
+</html>
