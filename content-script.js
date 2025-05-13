@@ -352,9 +352,9 @@ localStorage.removeItem = function(key) {
     // Remove from localStorage
     originalRemoveItem.call(localStorage, key);
     
-    // Also remove from extension storage
-    browser.storage.sync.remove('userBangs')
-      .catch(e => console.error('Error removing bangs from extension storage:', e));
+    // Also clear (don't just remove) from extension storage
+    browser.storage.sync.set({ userBangs: [] })
+      .catch(e => console.error('Error clearing bangs from extension storage:', e));
     
     return true;
   }
@@ -450,14 +450,64 @@ setInterval(() => {
   const currentValue = originalGetItem.call(localStorage, 'userBangs');
   if (currentValue !== lastUserBangsValue) {
     lastUserBangsValue = currentValue;
-    if (currentValue) {
-      try {
+    
+    try {
+      // Handle both updates and deletions
+      if (currentValue) {
+        // Normal case: localStorage has bangs, update sync storage
         const bangs = JSON.parse(currentValue);
         browser.storage.sync.set({ userBangs: bangs })
           .catch(e => console.error('Error saving bangs to extension storage after change detection:', e));
-      } catch (e) {
-        console.error('Error parsing userBangs JSON from change detection:', e);
+      } else {
+        // Handle deletion case: localStorage was cleared or set to null/undefined
+        browser.storage.sync.set({ userBangs: [] })
+          .catch(e => console.error('Error clearing bangs in extension storage:', e));
       }
+    } catch (e) {
+      console.error('Error handling userBangs change:', e);
     }
   }
 }, 1000); // Check every second
+
+function enhanceBangDescription() {
+  // Wait for the element to be present in the DOM
+  const interval = setInterval(() => {
+    const bangsDescription = document.querySelector('.user-banglist-container p');
+    if (bangsDescription) {
+      clearInterval(interval);
+      
+      // Determine browser type
+      const isFirefox = navigator.userAgent.includes('Firefox') || 
+                        typeof InstallTrigger !== 'undefined';
+      
+      // Add sync information based on browser type
+      if (isFirefox) {
+        bangsDescription.innerHTML = 
+          "This section will allow you to add your own bangs to CogiSearch. " +
+          "They will be saved in your browser memory and synchronized through your Firefox account.";
+      } else {
+        bangsDescription.innerHTML = 
+          "This section will allow you to add your own bangs to CogiSearch. " +
+          "They will be saved in your browser memory and synchronized through your Google account.";
+      }
+    }
+  }, 500); // Check every 500ms
+}
+
+// Call this function when the page loads
+window.addEventListener('load', enhanceBangDescription);
+
+// Also call it when DOM changes occur in case the element loads later
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    if (mutation.type === 'childList' && 
+        document.querySelector('.user-banglist-container')) {
+      enhanceBangDescription();
+    }
+  }
+});
+
+observer.observe(document.body, { 
+  childList: true, 
+  subtree: true 
+});
