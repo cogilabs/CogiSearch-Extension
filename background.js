@@ -61,4 +61,56 @@ if (browserAPI && browserAPI.runtime) {
       });
     }
   }
+
+  function mergeBangs(existingBangs, newBangs) {
+    // Start with existing bangs
+    const mergedBangs = [...existingBangs];
+    // Track existing bang shortnames for quick lookup
+    const existingShortnames = new Set(existingBangs.map(b => b.s));
+    
+    // Add new bangs that don't exist in the existing set
+    for (const newBang of newBangs) {
+      if (!existingShortnames.has(newBang.s)) {
+        mergedBangs.push(newBang);
+      }
+    }
+    
+    return mergedBangs;
+  }
+
+  // Listen for changes to sync storage and properly merge
+  browser.storage.sync.onChanged.addListener(async (changes) => {
+    if (changes.userBangs) {
+      const syncBangs = changes.userBangs.newValue || [];
+      
+      // Get current local bangs
+      let localBangsString = localStorage.getItem('userBangs');
+      let localBangs = [];
+      
+      try {
+        if (localBangsString) {
+          localBangs = JSON.parse(localBangsString);
+        }
+      } catch (e) {
+        console.error('Error parsing local bangs:', e);
+      }
+      
+      // IMPORTANT: Merge rather than replace
+      const mergedBangs = mergeBangs(localBangs, syncBangs);
+      
+      // Update localStorage with merged bangs
+      localStorage.setItem('userBangs', JSON.stringify(mergedBangs));
+      
+      // Also update sync storage if needed to ensure other browsers get the unique bangs
+      if (mergedBangs.length > syncBangs.length) {
+        await browser.storage.sync.set({ userBangs: mergedBangs });
+      }
+      
+      console.log('Merged bangs from sync:', { 
+        syncBangs, 
+        localBangs, 
+        mergedResult: mergedBangs 
+      });
+    }
+  });
 }
