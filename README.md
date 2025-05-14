@@ -35,7 +35,7 @@ You can find the extension here: https://addons.mozilla.org/en-US/firefox/addon/
 
 ### Chrome
 
-You can find the extension here: `Link not available yet`
+You can find the extension here: https://chromewebstore.google.com/detail/cogisearch/hnlkeooopnkhndcaafmdolkkgjkdnmfe
 
 ## How Bang Synchronization Works
 
