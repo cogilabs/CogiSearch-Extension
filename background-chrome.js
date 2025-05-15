@@ -23,8 +23,23 @@ try {
   // Listen for changes in storage to update UI in real-time across instances
   chrome.storage.onChanged.addListener(function(changes, areaName) {
     if (areaName === 'sync' && changes.userBangs) {
-      // Notify content script about storage changes
-      notifyContentScriptAboutChanges(changes.userBangs.newValue);
+      const newBangs = changes.userBangs.newValue || [];
+      
+      // Check if this is an intentional deletion
+      const isIntentionalDeletion = changes.bangsIntentionallyDeleted?.newValue === true;
+      
+      // Respect deletions - if the array is empty AND it was an intentional deletion, 
+      // don't try to merge or restore old bangs
+      if (isIntentionalDeletion && newBangs.length === 0) {
+        console.log("Bang deletion detected - not merging");
+        
+        // Notify content scripts about the deletion
+        notifyContentScriptAboutChanges([]);
+        return;
+      }
+      
+      // Normal case - notify content scripts about changes  
+      notifyContentScriptAboutChanges(newBangs);
     }
   });
 
@@ -70,61 +85,6 @@ try {
     }
   }
 
-  function mergeBangs(existingBangs, newBangs) {
-    // Start with existing bangs
-    const mergedBangs = [...existingBangs];
-    // Track existing bang shortnames for quick lookup
-    const existingShortnames = new Set(existingBangs.map(b => b.s));
-    
-    // Add new bangs that don't exist in the existing set
-    for (const newBang of newBangs) {
-      if (!existingShortnames.has(newBang.s)) {
-        mergedBangs.push(newBang);
-      }
-    }
-    
-    return mergedBangs;
-  }
-
-  // Listen for changes to sync storage and properly merge
-  chrome.storage.sync.onChanged.addListener(function(changes) {
-    if (changes.userBangs) {
-      const syncBangs = changes.userBangs.newValue || [];
-      
-      // Get current local bangs
-      let localBangsString = localStorage.getItem('userBangs');
-      let localBangs = [];
-      
-      try {
-        if (localBangsString) {
-          localBangs = JSON.parse(localBangsString);
-        }
-      } catch (e) {
-        console.error('Error parsing local bangs:', e);
-      }
-      
-      // IMPORTANT: Merge rather than replace
-      const mergedBangs = mergeBangs(localBangs, syncBangs);
-      
-      // Update localStorage with merged bangs
-      localStorage.setItem('userBangs', JSON.stringify(mergedBangs));
-      
-      // Also update sync storage if needed to ensure other browsers get the unique bangs
-      if (mergedBangs.length > syncBangs.length) {
-        chrome.storage.sync.set({ userBangs: mergedBangs }, function() {
-          if (chrome.runtime.lastError) {
-            console.error("Error updating sync storage:", chrome.runtime.lastError);
-          }
-        });
-      }
-      
-      console.log('Merged bangs from sync:', { 
-        syncBangs, 
-        localBangs, 
-        mergedResult: mergedBangs 
-      });
-    }
-  });
 } catch (e) {
   console.error('Error in background-chrome.js:', e);
 }

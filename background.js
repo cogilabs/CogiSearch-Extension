@@ -18,30 +18,6 @@ if (browserAPI && browserAPI.runtime) {
     }
   });
 
-  // Listen for changes in storage to update UI in real-time across instances
-  browserAPI.storage.onChanged.addListener(function(changes, areaName) {
-    if (areaName === 'sync' && changes.userBangs) {
-      // Notify content script about storage changes
-      notifyContentScriptAboutChanges(changes.userBangs.newValue);
-    }
-  });
-
-  // Notify content script about storage changes if the page is open
-  function notifyContentScriptAboutChanges(userBangs) {
-    browserAPI.tabs.query({ url: "https://search.cogilabs.eu/*" }, function(tabs) {
-      if (tabs.length > 0) {
-        for (const tab of tabs) {
-          browserAPI.tabs.sendMessage(tab.id, { 
-            action: "storageUpdated", 
-            userBangs 
-          }).catch(function(err) {
-            // Silently catch errors when tab isn't ready yet
-          });
-        }
-      }
-    });
-  }
-
   // Create context menu items for quick search
   function createContextMenuItems() {
     // Create context menu items if supported
@@ -62,55 +38,42 @@ if (browserAPI && browserAPI.runtime) {
     }
   }
 
-  function mergeBangs(existingBangs, newBangs) {
-    // Start with existing bangs
-    const mergedBangs = [...existingBangs];
-    // Track existing bang shortnames for quick lookup
-    const existingShortnames = new Set(existingBangs.map(b => b.s));
-    
-    // Add new bangs that don't exist in the existing set
-    for (const newBang of newBangs) {
-      if (!existingShortnames.has(newBang.s)) {
-        mergedBangs.push(newBang);
+  // Notify content script about storage changes if the page is open
+  function notifyContentScriptAboutChanges(userBangs) {
+    browserAPI.tabs.query({ url: "https://search.cogilabs.eu/*" }, function(tabs) {
+      if (tabs.length > 0) {
+        for (const tab of tabs) {
+          browserAPI.tabs.sendMessage(tab.id, { 
+            action: "storageUpdated", 
+            userBangs 
+          }).catch(function(err) {
+            // Silently catch errors when tab isn't ready yet
+          });
+        }
       }
-    }
-    
-    return mergedBangs;
+    });
   }
 
-  // Listen for changes to sync storage and properly merge
-  browser.storage.sync.onChanged.addListener(async (changes) => {
-    if (changes.userBangs) {
-      const syncBangs = changes.userBangs.newValue || [];
+  // Listen for changes in storage
+  browserAPI.storage.onChanged.addListener(async function(changes, areaName) {
+    if (areaName === 'sync' && changes.userBangs) {
+      const newBangs = changes.userBangs.newValue || [];
       
-      // Get current local bangs
-      let localBangsString = localStorage.getItem('userBangs');
-      let localBangs = [];
+      // Check if this is an intentional deletion
+      const isIntentionalDeletion = changes.bangsIntentionallyDeleted?.newValue === true;
       
-      try {
-        if (localBangsString) {
-          localBangs = JSON.parse(localBangsString);
-        }
-      } catch (e) {
-        console.error('Error parsing local bangs:', e);
+      // Respect deletions - if the array is empty AND it was an intentional deletion, 
+      // don't try to merge or restore old bangs
+      if (isIntentionalDeletion && newBangs.length === 0) {
+        console.log("Bang deletion detected - not merging");
+        
+        // Notify content scripts about the deletion
+        notifyContentScriptAboutChanges([]);
+        return;
       }
       
-      // IMPORTANT: Merge rather than replace
-      const mergedBangs = mergeBangs(localBangs, syncBangs);
-      
-      // Update localStorage with merged bangs
-      localStorage.setItem('userBangs', JSON.stringify(mergedBangs));
-      
-      // Also update sync storage if needed to ensure other browsers get the unique bangs
-      if (mergedBangs.length > syncBangs.length) {
-        await browser.storage.sync.set({ userBangs: mergedBangs });
-      }
-      
-      console.log('Merged bangs from sync:', { 
-        syncBangs, 
-        localBangs, 
-        mergedResult: mergedBangs 
-      });
+      // Normal case - notify content scripts about changes
+      notifyContentScriptAboutChanges(newBangs);
     }
   });
 }

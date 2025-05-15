@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CogiSearch",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Use CogiSearch as your search engine with synchronized custom bangs.",
   "icons": {
     "48": "icons/CogiSearch-icon48x.png",
